@@ -78,6 +78,7 @@ export const useQuizStore = defineStore({
       this.index = 0;
     },
     resetScore() {
+      this.selections = {};
       this.correctAnswersArray = [];
       this.correctAnswersCount = 0;
     },

@@ -15,9 +15,11 @@
 <script>
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useQuizStore } from "@/store";
 export default {
   name: "TheNavigation",
   setup() {
+    const quizStore = useQuizStore();
     const router = useRouter();
     const route = useRoute();
     let redirectUser = ref(null);
@@ -27,9 +29,10 @@ export default {
         redirectUser.value = confirm(
           "This action will end the quiz. Select OK to proceed, select Cancel to continue the quiz."
         );
-        redirectUser.value
-          ? router.push({ name: "Home" })
-          : router.push({ path: route.fullPath });
+        if (redirectUser.value) {
+          router.push({ name: "Home" });
+          quizStore.resetScore();
+        } else router.push({ path: route.fullPath });
       }
     };
     return { redirectUserToHome };
