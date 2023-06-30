@@ -20,12 +20,12 @@ const routes = [
         name: "question",
         component: () => import("./views/QuestionView.vue"),
       },
+      {
+        path: "score-board",
+        name: "score-board",
+        component: () => import("./views/ScoreBoard.vue"),
+      },
     ],
-  },
-  {
-    path: "/score-board",
-    name: "score-board",
-    component: () => import("./views/ScoreBoard.vue"),
   },
 ];
 

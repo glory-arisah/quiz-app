@@ -46,7 +46,6 @@ export const useQuizStore = defineStore({
     // start, stop and navigate quiz
     startQuiz() {
       this.index = 0;
-      // this.currQuestion = this.questions[this.index];
     },
     stopQuiz() {
       (this.index = null), (this.currQuestion = {});
@@ -62,7 +61,6 @@ export const useQuizStore = defineStore({
     },
     // handle user selection
     handleSelection(questionId, selectedIndex) {
-      console.log(this.questions);
       this.selections = { ...this.selections, [questionId]: selectedIndex };
     },
     markQuiz() {
@@ -70,12 +68,18 @@ export const useQuizStore = defineStore({
         [index]: question.options.indexOf(question.correct_answer),
       }));
       for (let key in correctAnswers) {
-        console.log(correctAnswers[key][key], this.selections[key]);
         if (correctAnswers[key][key] === this.selections[key]) {
           this.correctAnswersCount++;
           this.correctAnswersArray = [...this.correctAnswersArray, key];
         }
       }
+      // clear selections array
+      this.selections = {};
+      this.index = 0;
+    },
+    resetScore() {
+      this.correctAnswersArray = [];
+      this.correctAnswersCount = 0;
     },
   },
   getters: {
@@ -84,6 +88,11 @@ export const useQuizStore = defineStore({
     },
     noOfQuestions: (state) => {
       return state.questions.length;
+    },
+    showQuestions() {
+      return (
+        this.currentQuestion && Object.keys(this.currentQuestion).length > 1 // used 1 instead of 0 because there is 1 custom property
+      );
     },
   },
 });

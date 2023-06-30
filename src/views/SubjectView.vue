@@ -1,24 +1,21 @@
 <template>
   <section class="subject--container">
-    <article
-      class="start-quiz"
-      v-show="showQuestions === undefined || !showQuestions"
-    >
-      <p>Press the Next button when you are ready</p>
+    <subject-name />
+    <article class="start-quiz">
+      <p>Click on <strong>Start Quiz</strong> when you are ready</p>
       <button @click="quizStore.startQuiz">
-        <router-link :to="{ name: 'question' }"> Start Quiz </router-link>
+        <router-link :to="{ name: 'question' }" id="click-here">
+          Start Quiz
+        </router-link>
       </button>
     </article>
-    <template> </template>
-    <!-- <question-view v-if="showQuestions && showQuestions !== undefined" /> -->
   </section>
 </template>
 
 <script>
-// import QuestionView from "./QuestionView.vue";
-import { useQuizStore } from "../store/index";
+import SubjectName from "@/components/SubjectName.vue";
+import { useQuizStore } from "@/store/index";
 import { useRoute } from "vue-router";
-import { computed } from "@vue/reactivity";
 import { storeToRefs } from "pinia";
 export default {
   setup() {
@@ -27,23 +24,44 @@ export default {
     // get route properties
     const route = useRoute();
 
-    const { currentQuestion } = storeToRefs(quizStore);
-    // check if currentQuestion is populated
-    const showQuestions = computed(() => {
-      return (
-        quizStore.currentQuestion &&
-        Object.keys(quizStore.currentQuestion).length > 1 // used 1 instead of 0 because there is 1 custom property
-      );
-    });
-
+    const { currentQuestion, showQuestions } = storeToRefs(quizStore);
     // fetch the quiz on page load
     quizStore.fetchQuestions(route.params.id);
     return { quizStore, showQuestions, currentQuestion };
   },
   components: {
-    // QuestionView,
+    SubjectName,
   },
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+// mobile view
+.subject--container {
+  article {
+    text-align: center;
+    margin-top: 3rem;
+    // start quiz button
+    button {
+      border-width: 0;
+      border-radius: 5px;
+      padding: 0.4rem 1rem;
+      display: inline-block;
+      margin-top: 2rem;
+      background-color: #0096c7;
+      transition: transform 300ms;
+      a {
+        color: #ededed !important;
+      }
+    }
+  }
+}
+// medium to large screens
+// button {
+//   &:hover {
+//     transform: scale(1.1);
+//     transition: transform 300ms;
+//     background-color: #03a6dd;
+//   }
+// }
+</style>

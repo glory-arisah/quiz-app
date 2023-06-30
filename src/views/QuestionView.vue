@@ -1,11 +1,8 @@
 <template>
-  <article class="questions--container">
-    <template>
-      <the-loader />
-    </template>
-    <!-- <template>
-    </template> -->
-    <p class="question">{{ currentQuestion.question }}</p>
+  <the-loader v-show="!showQuestions" />
+  <subject-name />
+  <article class="questions--container" v-if="showQuestions">
+    <p class="question">{{ decode(currentQuestion.question) }}</p>
     <div class="options--container">
       <div class="options--letters">
         <span>A</span>
@@ -30,7 +27,7 @@
                 selected === index,
             }"
           >
-            {{ option }}
+            {{ decode(option) }}
           </p>
         </template>
       </div>
@@ -46,13 +43,12 @@
       <button @click="handleClick('next')" v-show="!isLastQuestion" id="next">
         Next
       </button>
-      <router-link :to="{ name: 'score-board' }">
+      <router-link :to="{ name: 'score-board' }" v-show="isLastQuestion">
         <button
           @click="
             quizStore.markQuiz();
             selected = null;
           "
-          v-show="isLastQuestion"
           id="submit"
         >
           Submit
@@ -63,16 +59,26 @@
 </template>
 
 <script>
+import SubjectName from "@/components/SubjectName.vue";
 import TheLoader from "@/components/TheLoader.vue";
+// import { useRouter } from "vue-router";
 import { computed } from "@vue/reactivity";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import { useQuizStore } from "../store/index";
 export default {
+  created() {
+    this.quizStore.resetScore();
+  },
+  mounted() {
+    this.selected = null;
+  },
+
   setup() {
     // setup quiz store
     const quizStore = useQuizStore();
-    const { currentQuestion, selections } = storeToRefs(quizStore);
+    const { currentQuestion, selections, showQuestions } =
+      storeToRefs(quizStore);
     // reference for selected option
     let selected = ref(null);
     // check if user is on the last question
@@ -84,12 +90,19 @@ export default {
     // reset selected option after user navigates quiz
     const resetSelection = () => (selected.value = null);
     const handleClick = (navType) => {
-      if (navType === "next") {
-        quizStore.nextQuestion();
-      } else if (navType === "prev") {
-        quizStore.previousQuestion();
-      }
+      navType === "next"
+        ? quizStore.nextQuestion()
+        : navType === "prev" && quizStore.previousQuestion();
       resetSelection();
+    };
+
+    // decoder for HTML entities
+    let decoder = ref(null);
+    const decode = (html) => {
+      decoder.value = decoder.value || document.createElement("div");
+      decoder.value.innerHTML = html;
+      console.log(decoder.value);
+      return decoder.value.textContent;
     };
 
     return {
@@ -99,24 +112,29 @@ export default {
       selected,
       handleClick,
       selections,
+      showQuestions,
+      decode,
       // index,
     };
   },
   components: {
     TheLoader,
+    SubjectName,
   },
 };
 </script>
 
 <style lang="scss" scoped>
+// mobile view
 .questions--container {
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: space-around;
   align-items: flex-start;
-  height: 25rem;
+  min-height: 22rem;
+  margin-top: 2rem;
   .question {
-    margin-bottom: -2rem;
+    // margin-bottom: 0.5rem;
     font: {
       weight: bold;
       size: 1.1rem;
@@ -125,23 +143,30 @@ export default {
   }
   .options--container {
     display: flex;
-    height: 30%;
+    width: 100%;
     .options--letters {
       display: flex;
       flex-direction: column;
       justify-content: space-around;
     }
     .options {
-      margin-left: 1rem;
+      margin-left: 0.5rem;
       display: flex;
+      width: 100%;
       flex-direction: column;
       justify-content: space-around;
       p {
         cursor: pointer;
+        padding: 0.3rem;
+        margin-block: 0.1rem;
       }
     }
     .selected {
-      background-color: #0766ba;
+      background-color: #0096c7;
+      color: #fff;
+      border-radius: 8px;
+      transition: background-color 200ms color 200ms;
+      // padding: 0 0.3rem;
     }
   }
   // action buttons
@@ -159,28 +184,45 @@ export default {
     }
     #prev {
       background-color: #ae3a08;
-      // margin-left: 1.5rem;
-      &:hover {
-        background-color: #dc4d10;
-      }
       &:disabled {
         background-color: gray;
         cursor: not-allowed;
       }
     }
     #next {
-      background-color: #164ce1;
-      // margin-right: 1.5rem;
-      &:hover {
-        background-color: #2962ff;
-      }
+      background-color: #0096c7;
     }
     #submit {
       background-color: #3e823e;
-      &:hover {
-        background-color: #55af55;
-      }
     }
   }
 }
+// medium to large screen
+// p {
+//   cursor: pointer;
+//   padding: 0.3rem;
+//   margin-block: 0.1rem;
+//   &:hover {
+//     background-color: #0096c7;
+//     color: #fff;
+//     border-radius: 8px;
+//     transition: background-color 200ms color 200ms;
+//   }
+// }
+
+// #prev {
+//  &:hover {
+//         background-color: #dc4d10;
+//       }
+// }
+// #next {
+//   &:hover {
+//         background-color: #00b3ef;
+//       }
+// }
+// #submit {
+//   &:hover {
+//         background-color: #55af55;
+//       }
+// }
 </style>
