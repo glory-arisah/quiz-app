@@ -45,11 +45,11 @@
       </button>
       <router-link :to="{ name: 'score-board' }" v-show="isLastQuestion">
         <button
+          id="submit"
           @click="
             quizStore.markQuiz();
             selected = null;
           "
-          id="submit"
         >
           Submit
         </button>
