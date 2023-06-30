@@ -1,6 +1,8 @@
 <template>
   <nav>
-    <h2 class="nav__heading">quiz app</h2>
+    <h2 class="nav__heading">
+      <router-link :to="{ name: 'Home' }"> quiz app </router-link>
+    </h2>
   </nav>
 </template>
 
