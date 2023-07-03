@@ -3,10 +3,14 @@
     <subject-name />
     <article class="start-quiz">
       <p>Click on <strong>Start Quiz</strong> when you are ready</p>
-      <button @click="quizStore.startQuiz">
-        <router-link :to="{ name: 'question' }" id="click-here">
-          Start Quiz
-        </router-link>
+      <button
+        @click="
+          quizStore.startQuiz();
+          $router.push({ name: 'questions' });
+        "
+        id="click-here"
+      >
+        Start Quiz
       </button>
     </article>
   </section>
@@ -18,16 +22,18 @@ import { useQuizStore } from "@/store/index";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 export default {
+  created() {
+    const route = useRoute();
+    this.quizStore.fetchQuestions(route.params.id);
+  },
   setup() {
     // get quiz store locally
     const quizStore = useQuizStore();
     // get route properties
-    const route = useRoute();
 
-    const { currentQuestion, showQuestions } = storeToRefs(quizStore);
+    const { currentQuestion } = storeToRefs(quizStore);
     // fetch the quiz on page load
-    quizStore.fetchQuestions(route.params.id);
-    return { quizStore, showQuestions, currentQuestion };
+    return { quizStore, currentQuestion };
   },
   components: {
     SubjectName,

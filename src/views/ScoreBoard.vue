@@ -1,17 +1,45 @@
 <template>
   <subject-name />
-  <section class="score-board--container">
+  <section class="score-board--container" v-show="correctAnswersCount >= 0">
     <p class="result">
       You score <strong>{{ correctAnswersCount }}</strong> out of
       <strong>{{ noOfQuestions }}.</strong>
-      <router-link :to="{ name: 'question' }">Click here</router-link> to retake
-      the test
-    </p>
-    <div class="home">
-      <router-link :to="{ name: 'Home' }"
-        ><span id="left-arrow">&#8592;</span>
-        <span id="back-to-home">Back to home</span></router-link
+      <button
+        @click="
+          quizStore.resetScore();
+          $router.push({ name: 'questions' });
+        "
+        class="clickables"
       >
+        Click here
+      </button>
+      to retake the test
+    </p>
+    <div class="correction">
+      View
+      <button
+        @click="
+          $router.push({ name: 'questions' });
+          quizStore.setSelectionMode(1);
+          quizStore.setIndexToZero();
+        "
+        class="clickables"
+      >
+        correct answers
+      </button>
+    </div>
+    <div class="home">
+      <button
+        @click="
+          $router.push({ name: 'Home' });
+          quizStore.resetScore();
+          quizStore.resetQuestions();
+        "
+        class="clickables"
+      >
+        <span id="left-arrow">&#8592;</span>
+        <span id="back-to-home">Back to home</span>
+      </button>
     </div>
   </section>
 </template>
@@ -34,6 +62,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.clickables {
+  border-width: 0;
+  font-size: 0.9rem;
+  color: #970707;
+  background-color: transparent;
+  cursor: pointer;
+}
 // mobile view
 .score-board--container {
   .result {
@@ -47,6 +82,10 @@ export default {
       margin-left: 0.2rem;
       text-decoration: underline;
     }
+  }
+  .correction {
+    margin-top: 1rem;
+    text-align: center;
   }
   .home {
     margin-top: 2.5rem;

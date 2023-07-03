@@ -66,6 +66,15 @@
         <p class="subject--par">Animals</p>
       </router-link>
     </article>
+    <article class="subject--container">
+      <router-link
+        @click="quizStore.clearIndex"
+        :to="{ name: 'subject', params: { id: 12, subjectName: 'music' } }"
+      >
+        <font-awesome-icon :icon="['fas', 'fa-music']" class="subject--icon" />
+        <p class="subject--par">Music</p>
+      </router-link>
+    </article>
   </section>
 </template>
 
