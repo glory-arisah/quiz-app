@@ -80,11 +80,15 @@
 
 <script>
 import { useQuizStore } from "@/store";
+import { onMounted } from "vue";
 import "../stylesheets/mobile.scss";
 export default {
   name: "SubjectList",
   setup() {
     const quizStore = useQuizStore();
+    onMounted(() => {
+      quizStore.resetQuestions();
+    });
     return { quizStore };
   },
 };

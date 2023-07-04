@@ -5,6 +5,14 @@
     <p class="question">
       <span>{{ questionNumber }}</span>
       <span>{{ decode(currentQuestion.question) }}</span>
+      <span
+        id="not-answered"
+        v-show="
+          selectionMode === 1 && selections[currentQuestion.questionId] === null
+        "
+      >
+        Not Answered!
+      </span>
     </p>
     <div class="options--container">
       <div class="options">
@@ -90,17 +98,24 @@ import { computed } from "@vue/reactivity";
 import { storeToRefs } from "pinia";
 import { useQuizStore } from "../store/index";
 export default {
-  mounted() {
-    this.selected = null;
-  },
+  // mounted() {
+  // this.selected = null;
+  // },
   setup() {
     // setup quiz store
     const quizStore = useQuizStore();
+    // fetch questions, index, score, user selections and selection mode on page reload
+    quizStore.fetchQuestionsFromLS();
+    quizStore.fetchIndexFromLS();
+    quizStore.fetchSelectionsFromLS();
+    quizStore.fetchSelectionModeFromLS();
+    quizStore.fetchCorrectAnswersFromLS();
     const { currentQuestion, selections, showQuestions, selectionMode } =
       storeToRefs(quizStore);
     // reference for selected option
     let selected = ref(null);
-    let questionNumber = ref(1);
+    // set question numbering and option letters
+    let questionNumber = ref(quizStore.index + 1);
     const optionsLetters = ["A", "B", "C", "D"];
     // check if user is on the last question
     const isLastQuestion = computed(() => {
@@ -109,7 +124,6 @@ export default {
       );
     });
     // background-color for wrong and right answers
-
     const isGreenBg = (index) => {
       if (quizStore.selectionMode === 1) {
         return (
@@ -186,6 +200,12 @@ export default {
   color: #fff;
   border-radius: 8px;
   transition: background-color 200ms color 200ms;
+}
+#not-answered {
+  display: block;
+  // margin-top: 0.4rem;
+  color: #c70000;
+  font-weight: bolder;
 }
 
 // mobile view

@@ -52,6 +52,9 @@ export default {
   name: "ScoreBoard",
   setup() {
     const quizStore = useQuizStore();
+    quizStore.fetchScoreFromLS();
+    quizStore.fetchQuestionsFromLS();
+    // fetch user score and questions -- to get the questions count
     const { correctAnswersCount, noOfQuestions } = storeToRefs(quizStore);
     return { quizStore, correctAnswersCount, noOfQuestions };
   },
