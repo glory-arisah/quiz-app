@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="subject--choice">Choose a subject</h1>
+    <h1 class="subject--choice">Test your knowledge in...</h1>
     <subject-list />
   </div>
 </template>

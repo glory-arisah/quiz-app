@@ -7,6 +7,7 @@
 
 <script>
 import TheNavigation from "./components/TheNavigation.vue";
+import "./styles.scss";
 export default {
   name: "App",
   components: {

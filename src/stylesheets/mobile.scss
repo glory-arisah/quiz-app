@@ -32,7 +32,8 @@ body {
     row-gap: 0.6rem;
     max-width: 18rem;
     // subject article
-    article {
+    a {
+      display: inline-block;
       background-color: #caf0f8;
       height: 5.6rem;
       width: 80%;
@@ -41,7 +42,13 @@ body {
       justify-content: center;
       color: #010101;
       border-radius: 7px;
-      transition: transform 300ms;
+      article {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
       // subject icon
       .subject--icon {
         font-size: 1.2rem;
@@ -53,10 +60,3 @@ body {
     }
   }
 }
-// medium to large
-// &:hover {
-//   transform: scale(1.1);
-//   cursor: pointer;
-//   text-decoration: underline;
-//   transition: transform 300ms;
-// }

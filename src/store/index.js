@@ -92,13 +92,12 @@ export const useQuizStore = defineStore({
     fetchCorrectAnswersFromLS() {
       this.correctAnswers = JSON.parse(localStorage.getItem("correctAnswers"));
     },
-    setIndexToZero() {
-      this.index = 0;
-    },
+    // setIndexToZero() {
+    //   this.index = 0;
+    // },
     // start, stop and navigate quiz
     startQuiz() {
       this.resetScore();
-      this.setIndexToZero();
       localStorage.setItem("index", JSON.stringify(this.index));
     },
     stopQuiz() {
@@ -154,8 +153,13 @@ export const useQuizStore = defineStore({
     resetScore() {
       this.selections = {};
       this.correctAnswersCount = 0;
-      localStorage.setItem("selections", JSON.stringify({}));
-      localStorage.setItem("correctAnswersCount", JSON.stringify(0));
+      this.index = 0;
+      localStorage.setItem("selections", JSON.stringify(this.selections));
+      localStorage.setItem(
+        "correctAnswersCount",
+        JSON.stringify(this.correctAnswersCount)
+      );
+      localStorage.setItem("index", JSON.stringify(this.index));
     },
     resetQuestions() {
       [this.questions, this.correctAnswers] = [[], null];

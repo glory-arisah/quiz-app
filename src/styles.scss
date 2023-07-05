@@ -1,0 +1,13 @@
+$md: 40em;
+
+@import "./stylesheets/mobile.scss";
+
+@mixin responsive($size) {
+  @media (min-width: $size) {
+    @content;
+  }
+}
+
+@include responsive($md) {
+  @import "./stylesheets/medium-screen.scss";
+}

@@ -15,33 +15,31 @@
       </span>
     </p>
     <div class="options--container">
-      <div class="options">
-        <template
-          v-for="(option, index) in currentQuestion.options"
-          :key="option"
+      <template
+        v-for="(option, index) in currentQuestion.options"
+        :key="option"
+      >
+        <p
+          :data-selected="option"
+          @click="
+            selectionMode === 0 &&
+              quizStore.handleSelection(currentQuestion.questionId, index);
+            selected = index;
+          "
+          :class="{
+            selected:
+              !selectionMode &&
+              (selections[currentQuestion.questionId] === index ||
+                selected === index),
+            'green-bg': isGreenBg(index),
+            'red-bg': isRedBg(index),
+          }"
+          :disabled="selectionMode"
         >
-          <p
-            :data-selected="option"
-            @click="
-              selectionMode === 0 &&
-                quizStore.handleSelection(currentQuestion.questionId, index);
-              selected = index;
-            "
-            :class="{
-              selected:
-                !selectionMode &&
-                (selections[currentQuestion.questionId] === index ||
-                  selected === index),
-              'green-bg': isGreenBg(index),
-              'red-bg': isRedBg(index),
-            }"
-            :disabled="selectionMode"
-          >
-            <span class="option--letter">{{ optionsLetters[index] }}</span>
-            {{ decode(option) }}
-          </p>
-        </template>
-      </div>
+          <span class="option--letter">{{ optionsLetters[index] }}</span>
+          {{ decode(option) }}
+        </p>
+      </template>
     </div>
     <section class="action__btns">
       <button
@@ -188,7 +186,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// util
+// utilities for corrections
 .green-bg {
   background-color: #00c76a;
   color: #fff;
@@ -233,17 +231,15 @@ export default {
   .options--container {
     display: flex;
     width: 100%;
-    .options {
-      margin-left: 0.5rem;
-      display: flex;
-      width: 100%;
-      flex-direction: column;
-      justify-content: space-around;
-      p {
-        cursor: pointer;
-        padding: 0.3rem;
-        margin-block: 0.1rem;
-      }
+    margin-left: 0.5rem;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    justify-content: space-around;
+    p {
+      cursor: pointer;
+      padding: 0.3rem;
+      margin-block: 0.1rem;
     }
     .selected {
       background-color: #0096c7;

@@ -1,0 +1,92 @@
+.main {
+  margin-top: 2rem !important;
+  width: 85% !important;
+  h1 {
+    margin-block: 3rem;
+  }
+  // subject list view
+  .subjects__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    row-gap: 1rem;
+    min-width: 80%;
+    margin: 0rem auto 0 auto !important;
+    & > * {
+      display: block;
+      width: 84%;
+      height: 7rem;
+      transition: transform 300ms;
+      article {
+        width: 100%;
+        height: 100%;
+        svg {
+          font-size: 1.55rem;
+        }
+        p {
+          margin-top: 0.3rem;
+          font-size: 1.005rem;
+        }
+      }
+      // hover styling for subject list links
+      &:hover {
+        transform: scale(1.1);
+        cursor: pointer;
+        transition: transform 300ms;
+        border: 1px solid #92edff;
+        border-radius: 8px;
+        & > article {
+          color: #0096c7;
+        }
+      }
+    }
+  }
+  // subject view
+  .subject--container {
+    .start-quiz {
+      p {
+        font-size: 1.15rem;
+      }
+      button {
+        padding: 0.5rem 0.7rem !important;
+        color: #fff;
+        font-size: 1rem;
+        margin-top: 2rem !important;
+        &:hover {
+          transform: scale(1.1);
+          transition: transform 300ms;
+          background-color: #03a6dd;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+  .questions--container {
+    margin-top: 0 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-start;
+    .question {
+      margin-top: 3.2rem;
+    }
+    .options--container {
+      // margin-top: 2.5rem !important;
+      margin-left: 0 !important;
+    }
+    .action__btns {
+      justify-content: center !important;
+      margin-top: 1rem !important;
+      button:first-child {
+        margin-right: 1.2rem !important;
+      }
+      button:nth-child(2) {
+        margin-left: 1.2rem !important;
+      }
+    }
+  }
+  // subject name button
+  .subject--name {
+    margin-top: 0 !important;
+    font-size: 0.9rem;
+  }
+}

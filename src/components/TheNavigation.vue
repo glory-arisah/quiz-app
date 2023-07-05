@@ -25,7 +25,11 @@ export default {
     let redirectUser = ref(null);
     // check if quiz has started and end quiz if user navigates to home during or before quiz
     const redirectUserToHome = () => {
-      if (route.name !== "Home" && route.name !== "score-board") {
+      if (
+        route.name !== "Home" &&
+        route.name !== "score-board" &&
+        route.name !== "subject"
+      ) {
         redirectUser.value = confirm(
           "This action will end the quiz. Select OK to proceed, select Cancel to continue the quiz."
         );
