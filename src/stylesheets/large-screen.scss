@@ -1,0 +1,15 @@
+.main {
+  // width: 70% !important;
+  .subjects__grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .subject--container {
+    .tip {
+      text-align: center;
+    }
+  }
+  .questions--container {
+    width: 65% !important;
+    margin: 0 auto;
+  }
+}

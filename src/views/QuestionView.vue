@@ -1,5 +1,5 @@
 <template>
-  <subject-name />
+  <subject-name /><the-timer v-if="!selectionMode" />
   <the-loader v-show="!showQuestions" />
   <article class="questions--container" v-if="showQuestions">
     <p class="question">
@@ -67,6 +67,7 @@
         id="submit"
         v-show="isLastQuestion && !selectionMode"
         @click="
+          quizStore.stopQuiz();
           $router.push({ name: 'score-board' });
           selected = null;
           quizStore.markQuiz();
@@ -88,101 +89,79 @@
   </article>
 </template>
 
-<script>
+<script setup>
 import SubjectName from "@/components/SubjectName.vue";
+import TheTimer from "@/components/TheTimer.vue";
 import TheLoader from "@/components/TheLoader.vue";
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { computed } from "@vue/reactivity";
 import { storeToRefs } from "pinia";
 import { useQuizStore } from "../store/index";
-export default {
-  // mounted() {
-  // this.selected = null;
-  // },
-  setup() {
-    // setup quiz store
-    const quizStore = useQuizStore();
-    // fetch questions, index, score, user selections and selection mode on page reload
-    quizStore.fetchQuestionsFromLS();
-    quizStore.fetchIndexFromLS();
-    quizStore.fetchSelectionsFromLS();
-    quizStore.fetchSelectionModeFromLS();
-    quizStore.fetchCorrectAnswersFromLS();
-    const { currentQuestion, selections, showQuestions, selectionMode } =
-      storeToRefs(quizStore);
-    // reference for selected option
-    let selected = ref(null);
-    // set question numbering and option letters
-    let questionNumber = ref(quizStore.index + 1);
-    const optionsLetters = ["A", "B", "C", "D"];
-    // check if user is on the last question
-    const isLastQuestion = computed(() => {
-      return (
-        quizStore.currentQuestion.questionId === quizStore.questions.length - 1
-      );
-    });
-    // background-color for wrong and right answers
-    const isGreenBg = (index) => {
-      if (quizStore.selectionMode === 1) {
-        return (
-          index ===
-          quizStore.correctAnswers[quizStore.currentQuestion.questionId]
-        );
-      }
-    };
-    const isRedBg = (index) => {
-      if (quizStore.selectionMode === 1 && !quizStore.compSelectAndCorrection) {
-        console.log(quizStore.compSelectAndCorrection);
-        return (
-          index === quizStore.selections[quizStore.currentQuestion.questionId]
-        );
-      }
-    };
-    // increment/decrement question number
-    const incDecQuestionNo = (type) => {
-      if (type === "inc" && questionNumber.value >= 0) questionNumber.value++;
-      else if (
-        type === "dec" &&
-        questionNumber.value <= quizStore.questions.length
-      )
-        questionNumber.value--;
-    };
-    // navigate quiz and reset selected option after user navigates quiz
-    const handleClick = (navType) => {
-      navType === "next"
-        ? quizStore.nextQuestion()
-        : navType === "prev" && quizStore.previousQuestion();
-      selected.value = null;
-    };
-    // decoder for HTML entities
-    let decoder = ref(null);
-    const decode = (html) => {
-      decoder.value = decoder.value || document.createElement("div");
-      decoder.value.innerHTML = html;
-      return decoder.value.textContent;
-    };
-    return {
-      quizStore,
-      currentQuestion,
-      isLastQuestion,
-      selected,
-      handleClick,
-      selections,
-      showQuestions,
-      decode,
-      optionsLetters,
-      questionNumber,
-      incDecQuestionNo,
-      selectionMode,
-      isGreenBg,
-      isRedBg,
-    };
-  },
-  components: {
-    TheLoader,
-    SubjectName,
-  },
+// setup quiz store
+const quizStore = useQuizStore();
+// fetch questions, index, score, user selections and selection mode on page reload
+quizStore.fetchQuestionsFromLS();
+quizStore.fetchIndexFromLS();
+quizStore.fetchSelectionsFromLS();
+quizStore.fetchSelectionModeFromLS();
+quizStore.fetchCorrectAnswersFromLS();
+// reset timer on create
+!quizStore.selectionMode && quizStore.resetTimer();
+// start timer on mount if user is in selection mode
+onMounted(() => {
+  !quizStore.selectionMode && quizStore.startTimer();
+});
+const { currentQuestion, selections, showQuestions, selectionMode } =
+  storeToRefs(quizStore);
+// reference for selected option
+let selected = ref(null);
+// set question numbering and option letters
+let questionNumber = ref(quizStore.index + 1);
+const optionsLetters = ["A", "B", "C", "D"];
+// check if user is on the last question
+const isLastQuestion = computed(() => {
+  return (
+    quizStore.currentQuestion.questionId === quizStore.questions.length - 1
+  );
+});
+// background-color for wrong and right answers
+const isGreenBg = (index) => {
+  if (quizStore.selectionMode === 1) {
+    return (
+      index === quizStore.correctAnswers[quizStore.currentQuestion.questionId]
+    );
+  }
 };
+const isRedBg = (index) => {
+  if (quizStore.selectionMode === 1 && !quizStore.compSelectAndCorrection) {
+    console.log(quizStore.compSelectAndCorrection);
+    return index === quizStore.selections[quizStore.currentQuestion.questionId];
+  }
+};
+// increment/decrement question number
+const incDecQuestionNo = (type) => {
+  if (type === "inc" && questionNumber.value >= 0) questionNumber.value++;
+  else if (type === "dec" && questionNumber.value <= quizStore.questions.length)
+    questionNumber.value--;
+};
+// navigate quiz and reset selected option after user navigates quiz
+const handleClick = (navType) => {
+  navType === "next"
+    ? quizStore.nextQuestion()
+    : navType === "prev" && quizStore.previousQuestion();
+  selected.value = null;
+};
+// decoder for HTML entities
+let decoder = ref(null);
+const decode = (html) => {
+  decoder.value = decoder.value || document.createElement("div");
+  decoder.value.innerHTML = html;
+  return decoder.value.textContent;
+};
+
+onUnmounted(() => {
+  quizStore.stopTimer();
+});
 </script>
 
 <style lang="scss" scoped>

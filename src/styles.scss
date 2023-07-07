@@ -1,4 +1,5 @@
 $md: 40em;
+$lg: 52em;
 
 @import "./stylesheets/mobile.scss";
 
@@ -10,4 +11,8 @@ $md: 40em;
 
 @include responsive($md) {
   @import "./stylesheets/medium-screen.scss";
+}
+
+@include responsive($lg) {
+  @import "./stylesheets/large-screen.scss";
 }

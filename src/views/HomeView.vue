@@ -5,14 +5,8 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import SubjectList from "@/components/SubjectList.vue";
-export default {
-  setup() {},
-  components: {
-    SubjectList,
-  },
-};
 </script>
 
 <style lang="scss" scoped></style>

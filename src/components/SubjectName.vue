@@ -2,11 +2,7 @@
   <button class="subject--name">{{ $route.params.subjectName }}</button>
 </template>
 
-<script>
-export default {
-  name: "SubjectName",
-};
-</script>
+<script setup></script>
 
 <style lang="scss" scoped>
 .subject--name {

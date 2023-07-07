@@ -12,6 +12,7 @@ import {
   faDog,
   faSpinner,
   faMusic,
+  faLandmark,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -21,7 +22,8 @@ library.add(
   faCalculator,
   faDog,
   faSpinner,
-  faMusic
+  faMusic,
+  faLandmark
 );
 
 const pinia = createPinia();

@@ -5,16 +5,9 @@
   </main>
 </template>
 
-<script>
+<script setup>
 import TheNavigation from "./components/TheNavigation.vue";
 import "./styles.scss";
-export default {
-  name: "App",
-  components: {
-    TheNavigation,
-  },
-  setup() {},
-};
 </script>
 
 <style></style>

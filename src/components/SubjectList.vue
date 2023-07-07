@@ -1,7 +1,7 @@
 <template>
   <section class="subjects__grid">
     <router-link
-      @click.prevent="quizStore.clearIndex"
+      @click.prevent="quizStore.setIndexToZero"
       :to="{
         name: 'subject',
         params: { id: 18, subjectName: 'computers' },
@@ -16,7 +16,7 @@
       </article>
     </router-link>
     <router-link
-      @click.prevent="quizStore.clearIndex"
+      @click.prevent="quizStore.setIndexToZero"
       :to="{ name: 'subject', params: { id: 21, subjectName: 'sports' } }"
     >
       <article class="subject--container">
@@ -28,7 +28,7 @@
       </article>
     </router-link>
     <router-link
-      @click.prevent="quizStore.clearIndex"
+      @click.prevent="quizStore.setIndexToZero"
       :to="{
         name: 'subject',
         params: { id: 26, subjectName: 'celebrities' },
@@ -43,7 +43,7 @@
       </article>
     </router-link>
     <router-link
-      @click.prevent="quizStore.clearIndex"
+      @click.prevent="quizStore.setIndexToZero"
       :to="{
         name: 'subject',
         params: { id: 19, subjectName: 'mathematics' },
@@ -58,7 +58,7 @@
       </article>
     </router-link>
     <router-link
-      @click.prevent="quizStore.clearIndex"
+      @click.prevent="quizStore.setIndexToZero"
       :to="{ name: 'subject', params: { id: 27, subjectName: 'animals' } }"
     >
       <article class="subject--container">
@@ -67,7 +67,7 @@
       </article>
     </router-link>
     <router-link
-      @click.prevent="quizStore.clearIndex"
+      @click.prevent="quizStore.setIndexToZero"
       :to="{ name: 'subject', params: { id: 12, subjectName: 'music' } }"
     >
       <article class="subject--container">
@@ -75,22 +75,28 @@
         <p class="subject--par">Music</p>
       </article>
     </router-link>
+    <router-link
+      @click.prevent="quizStore.setIndexToZero"
+      :to="{ name: 'subject', params: { id: 24, subjectName: 'politics' } }"
+    >
+      <article class="subject--container">
+        <font-awesome-icon
+          :icon="['fas', 'fa-landmark']"
+          class="subject--icon"
+        />
+        <p class="subject--par">Politics</p>
+      </article>
+    </router-link>
   </section>
 </template>
 
-<script>
+<script setup>
 import { useQuizStore } from "@/store";
 import { onMounted } from "vue";
-export default {
-  name: "SubjectList",
-  setup() {
-    const quizStore = useQuizStore();
-    onMounted(() => {
-      quizStore.resetQuestions();
-    });
-    return { quizStore };
-  },
-};
+const quizStore = useQuizStore();
+onMounted(() => {
+  quizStore.resetQuestions();
+});
 </script>
 
 <style lang="scss" scoped></style>

@@ -1,9 +1,7 @@
 <template>
   <section class="subject--container">
     <subject-name />
-    <!-- <div class="loader--container"> -->
     <the-loader v-show="!noOfQuestions" />
-    <!-- </div> -->
     <article class="tip--container" v-show="noOfQuestions">
       <p class="tip">
         This free practice test contains {{ noOfQuestions }} questions with no
@@ -30,32 +28,17 @@
   </section>
 </template>
 
-<script>
+<script setup>
 import TheLoader from "@/components/TheLoader.vue";
 import SubjectName from "@/components/SubjectName.vue";
 import { useQuizStore } from "@/store/index";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
-export default {
-  created() {
-    const route = useRoute();
-    this.quizStore.fetchQuestions(route.params.id);
-  },
-  setup() {
-    // get quiz store locally
-    const quizStore = useQuizStore();
-    // get route properties
-
-    const { currentQuestion, noOfQuestions, questions } =
-      storeToRefs(quizStore);
-    // fetch the quiz on page load
-    return { quizStore, currentQuestion, noOfQuestions, questions };
-  },
-  components: {
-    SubjectName,
-    TheLoader,
-  },
-};
+// fetch the quiz on page load
+const route = useRoute();
+const quizStore = useQuizStore();
+quizStore.fetchQuestions(route.params.id);
+const { noOfQuestions } = storeToRefs(quizStore);
 </script>
 
 <style lang="scss" scoped>

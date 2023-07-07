@@ -12,35 +12,29 @@
   </nav>
 </template>
 
-<script>
+<script setup>
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useQuizStore } from "@/store";
-export default {
-  name: "TheNavigation",
-  setup() {
-    const quizStore = useQuizStore();
-    const router = useRouter();
-    const route = useRoute();
-    let redirectUser = ref(null);
-    // check if quiz has started and end quiz if user navigates to home during or before quiz
-    const redirectUserToHome = () => {
-      if (
-        route.name !== "Home" &&
-        route.name !== "score-board" &&
-        route.name !== "subject"
-      ) {
-        redirectUser.value = confirm(
-          "This action will end the quiz. Select OK to proceed, select Cancel to continue the quiz."
-        );
-        if (redirectUser.value) {
-          router.push({ name: "Home" });
-          quizStore.resetScore();
-        } else router.push({ path: route.fullPath });
-      }
-    };
-    return { redirectUserToHome };
-  },
+const quizStore = useQuizStore();
+const router = useRouter();
+const route = useRoute();
+let redirectUser = ref(null);
+// check if quiz has started and end quiz if user navigates to home during or before quiz
+const redirectUserToHome = () => {
+  if (
+    route.name !== "Home" &&
+    route.name !== "score-board" &&
+    route.name !== "subject"
+  ) {
+    redirectUser.value = confirm(
+      "This action will end the quiz. Select OK to proceed, select Cancel to continue the quiz."
+    );
+    if (redirectUser.value) {
+      router.push({ name: "Home" });
+      quizStore.resetScore();
+    } else router.push({ path: route.fullPath });
+  }
 };
 </script>
 

@@ -4,11 +4,7 @@
   </section>
 </template>
 
-<script>
-export default {
-  name: "TheLoader",
-};
-</script>
+<script setup></script>
 
 <style scoped lang="scss">
 section {

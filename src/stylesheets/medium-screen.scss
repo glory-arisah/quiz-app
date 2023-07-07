@@ -60,6 +60,7 @@
       }
     }
   }
+  // questions view
   .questions--container {
     margin-top: 0 !important;
     display: flex;
@@ -81,6 +82,38 @@
       }
       button:nth-child(2) {
         margin-left: 1.2rem !important;
+      }
+    }
+  }
+  // score board
+  .score-board--container {
+    .result {
+      display: flex !important;
+      align-items: center;
+      a {
+        &:hover {
+          text-decoration: none;
+        }
+      }
+      .chart--container {
+        canvas {
+          width: 16.5rem;
+          height: 16.5rem;
+        }
+      }
+    }
+    .home {
+      #back-to-home {
+        &:hover {
+          margin-left: 0.4rem;
+          transition: margin-left 200ms;
+        }
+      }
+    }
+    .clickables {
+      font-size: 1rem;
+      &:hover {
+        color: #0096c7;
       }
     }
   }

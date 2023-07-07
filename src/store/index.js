@@ -1,32 +1,50 @@
 import { defineStore } from "pinia";
+import { LocalStorageActions } from "./actions/quizLSActions";
+import { NavigationActions } from "./actions/quizNavActions";
+import { TimerActions } from "@/store/actions/quizTimerActions";
+import { QuizCoreState } from "./state/quizCoreState";
 import axios from "axios";
 
-const randomizeOptions = (array) => {
-  let [currentIndex, randomIndex] = [array.length, 0];
+// PURE FUNCTIONS
+// re-arrange quiz question's options
+const randomizeOptions = (options) => {
+  let [currentIndex, randomIndex] = [options.length, 0];
   while (currentIndex !== 0) {
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex],
-      array[currentIndex],
+    [options[currentIndex], options[randomIndex]] = [
+      options[randomIndex],
+      options[currentIndex],
     ];
   }
-  return array;
+  return options;
+};
+// format timer
+export const formatTimer = (timeInSecs) => {
+  let minutes = Math.floor(timeInSecs / 60);
+  let seconds = parseInt(timeInSecs - 60 * minutes);
+  seconds = seconds < 10 ? `0${seconds}` : seconds;
+  minutes = minutes < 10 ? `0${minutes}` : minutes;
+  return `${minutes}:${seconds}`;
 };
 
 export const useQuizStore = defineStore({
   id: "quiz",
   state: () => ({
-    questions: [],
-    correctAnswers: {},
-    index: null,
-    selections: {},
-    correctAnswersCount: null,
-    correctAnswersArray: [],
+    ...QuizCoreState(),
     // 0 represents the selection mode, 1 represents correction mode
     selectionMode: 0,
+    timeUsed: 0,
+    interval: null,
   }),
   actions: {
+    // fetch data from local storage after page reload/refresh
+    ...LocalStorageActions(),
+    // start, stop and navigate quiz
+    ...NavigationActions(),
+    // start/stop quiz timer
+    ...TimerActions(),
+    // fetch questions from OpenTrivia quiz API
     async fetchQuestions(id) {
       try {
         const {
@@ -64,92 +82,12 @@ export const useQuizStore = defineStore({
         console.log("Error message", error);
       }
     },
-    fetchQuestionsFromLS() {
-      if (!this.questions.length)
-        this.questions = JSON.parse(localStorage.getItem("questions"));
-    },
-    fetchIndexFromLS() {
-      if (this.index === null)
-        this.index = JSON.parse(localStorage.getItem("index"));
-    },
-    fetchScoreFromLS() {
-      if (this.correctAnswersCount === null) {
-        this.correctAnswersCount = JSON.parse(
-          localStorage.getItem("correctAnswersCount")
-        );
-      }
-    },
-    fetchSelectionsFromLS() {
-      if (Object.keys(this.selections).length === 0) {
-        this.selections = JSON.parse(localStorage.getItem("selections"));
-      }
-    },
-    fetchSelectionModeFromLS() {
-      this.selectionMode = parseInt(
-        JSON.parse(localStorage.getItem("selectionMode"))
-      );
-    },
-    fetchCorrectAnswersFromLS() {
-      this.correctAnswers = JSON.parse(localStorage.getItem("correctAnswers"));
-    },
-    // setIndexToZero() {
-    //   this.index = 0;
-    // },
-    // start, stop and navigate quiz
-    startQuiz() {
-      this.resetScore();
-      localStorage.setItem("index", JSON.stringify(this.index));
-    },
-    stopQuiz() {
-      this.index = null;
-      this.currQuestion = {};
-      localStorage.setItem("index", JSON.stringify(this.index));
-    },
-    nextQuestion() {
-      this.index++;
-      localStorage.setItem("index", JSON.stringify(this.index));
-    },
-    previousQuestion() {
-      this.index--;
-      localStorage.setItem("index", JSON.stringify(this.index));
-    },
-    clearIndex() {
-      this.index = null;
-      localStorage.setItem("index", JSON.stringify(this.index));
-    },
-    // handle user selection
-    handleSelection(questionId, selectedIndex) {
-      // fetch questions from localStorage after page refresh
-      this.fetchQuestionsFromLS();
-      this.fetchIndexFromLS();
-      // set all selections to `null` if the selections object is empty
-      if (Object.keys(this.selections).length === 0) {
-        this.questions.forEach((_, index) => {
-          this.selections[index] = null;
-        });
-      }
-      this.selections[questionId] = selectedIndex;
-      localStorage.setItem("selections", JSON.stringify(this.selections));
-    },
-    markQuiz() {
-      if (!Object.keys(this.correctAnswers).length) {
-        this.correctAnswers = JSON.parse(
-          localStorage.getItem("correctAnswers")
-        );
-      }
-      for (let key in this.correctAnswers) {
-        if (this.correctAnswers[key] === this.selections[key]) {
-          this.correctAnswersCount++;
-          localStorage.setItem(
-            "correctAnswersCount",
-            JSON.stringify(this.correctAnswersCount)
-          );
-          // this.correctAnswersArray = [...this.correctAnswersArray, key];
-        }
-      }
-      // set index to first question
+    // reset index and currentQuestion concurrently
+    setIndexToZero() {
       this.index = 0;
+      localStorage.setItem("index", JSON.stringify(this.index));
     },
+    // reset user's previous selections and score
     resetScore() {
       this.selections = {};
       this.correctAnswersCount = 0;
@@ -161,13 +99,15 @@ export const useQuizStore = defineStore({
       );
       localStorage.setItem("index", JSON.stringify(this.index));
     },
+    // erase previous questions, clear correct answers and index
     resetQuestions() {
-      [this.questions, this.correctAnswers] = [[], null];
+      [this.questions, this.correctAnswers, this.index] = [[], null, null];
       localStorage.setItem("questions", JSON.stringify([]));
       localStorage.setItem("index", JSON.stringify(null));
       localStorage.setItem("correctAnswers", JSON.stringify({}));
       localStorage.setItem("questionsCount", JSON.stringify(null));
     },
+    // set the quiz mode to selection -- user can select answers(read/write mode) or correction -- users can view the answers as corrections (read-only mode)
     setSelectionMode(value) {
       this.selectionMode = parseInt(value);
       localStorage.setItem("selectionMode", JSON.stringify(this.selectionMode));
@@ -178,9 +118,7 @@ export const useQuizStore = defineStore({
       return { ...state.questions[state.index], questionId: state.index };
     },
     noOfQuestions(state) {
-      return state.questions.length
-        ? state.questions.length
-        : parseInt(JSON.parse(localStorage.getItem("questionsCount")));
+      return state.questions.length;
     },
     showQuestions() {
       return (
@@ -192,6 +130,9 @@ export const useQuizStore = defineStore({
         state.correctAnswers[this.currentQuestion.questionId] ===
         state.selections[this.currentQuestion.questionId]
       );
+    },
+    formatTimeUsed(state) {
+      return formatTimer(state.timeUsed);
     },
   },
 });
