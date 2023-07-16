@@ -12,16 +12,16 @@
   </nav>
 </template>
 
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { ref, Ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useQuizStore } from "@/store";
 const quizStore = useQuizStore();
 const router = useRouter();
 const route = useRoute();
-let redirectUser = ref(null);
+let redirectUser: Ref<boolean | null> = ref(null);
 // check if quiz has started and end quiz if user navigates to home during or before quiz
-const redirectUserToHome = () => {
+const redirectUserToHome = (): void => {
   if (
     route.name !== "Home" &&
     route.name !== "score-board" &&

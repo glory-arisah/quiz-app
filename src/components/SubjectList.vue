@@ -90,7 +90,7 @@
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useQuizStore } from "@/store";
 import { onMounted } from "vue";
 const quizStore = useQuizStore();

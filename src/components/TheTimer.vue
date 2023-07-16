@@ -4,24 +4,28 @@
   </section>
 </template>
 
-<script setup>
-import { ref, watch, onUnmounted } from "vue";
+<script setup lang="ts">
+import { ref, watch, onUnmounted, computed } from "vue";
 import { formatTimer } from "@/store/index";
 import { useQuizStore } from "@/store/index";
 import { useRouter } from "vue-router";
 
+const router = useRouter();
 const quizStore = useQuizStore();
-const countDownToTime = ref(null);
+const countDownToTime = ref(0);
+// fetch the current countdown time from LocalStorage on refresh
+const getCountTimeFromLS = computed((): number => {
+  return Number(localStorage.getItem("countDownToTime"));
+});
 if (quizStore.noOfQuestions) {
   countDownToTime.value = localStorage.getItem("countDownToTime")
-    ? JSON.parse(localStorage.getItem("countDownToTime"))
+    ? getCountTimeFromLS.value
     : (quizStore.noOfQuestions - 3) * 60;
 }
-const router = useRouter();
 watch(
   () => countDownToTime.value,
   (newTime) => {
-    let countDownTimeOut = null;
+    let countDownTimeOut;
     if (newTime >= 0) {
       countDownTimeOut = setTimeout(() => countDownToTime.value--, 1000);
       localStorage.setItem(

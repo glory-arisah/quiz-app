@@ -4,7 +4,7 @@
   <article class="questions--container" v-if="showQuestions">
     <p class="question">
       <span>{{ questionNumber }}</span>
-      <span>{{ decode(currentQuestion.question) }}</span>
+      <span>{{ decode<string>(currentQuestion.question) }}</span>
       <span
         id="not-answered"
         v-show="
@@ -37,7 +37,7 @@
           :disabled="selectionMode"
         >
           <span class="option--letter">{{ optionsLetters[index] }}</span>
-          {{ decode(option) }}
+          {{ decode<string>(option) }}
         </p>
       </template>
     </div>
@@ -68,9 +68,9 @@
         v-show="isLastQuestion && !selectionMode"
         @click="
           quizStore.stopQuiz();
+          quizStore.markQuiz();
           $router.push({ name: 'score-board' });
           selected = null;
-          quizStore.markQuiz();
         "
       >
         Submit
@@ -89,75 +89,85 @@
   </article>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import SubjectName from "@/components/SubjectName.vue";
 import TheTimer from "@/components/TheTimer.vue";
 import TheLoader from "@/components/TheLoader.vue";
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, Ref, onMounted, onUnmounted } from "vue";
 import { computed } from "@vue/reactivity";
 import { storeToRefs } from "pinia";
 import { useQuizStore } from "../store/index";
 // setup quiz store
 const quizStore = useQuizStore();
+
 // fetch questions, index, score, user selections and selection mode on page reload
 quizStore.fetchQuestionsFromLS();
 quizStore.fetchIndexFromLS();
 quizStore.fetchSelectionsFromLS();
 quizStore.fetchSelectionModeFromLS();
 quizStore.fetchCorrectAnswersFromLS();
+
 // reset timer on create
 !quizStore.selectionMode && quizStore.resetTimer();
+
+// options letters
+const optionsLetters = ["A", "B", "C", "D"];
+
 // start timer on mount if user is in selection mode
 onMounted(() => {
   !quizStore.selectionMode && quizStore.startTimer();
 });
+
 const { currentQuestion, selections, showQuestions, selectionMode } =
   storeToRefs(quizStore);
+
 // reference for selected option
-let selected = ref(null);
+let selected: Ref<number | null> = ref(null);
+
 // set question numbering and option letters
-let questionNumber = ref(quizStore.index + 1);
-const optionsLetters = ["A", "B", "C", "D"];
+let questionNumber = ref(quizStore.index + 1)
+
 // check if user is on the last question
-const isLastQuestion = computed(() => {
+const isLastQuestion = computed<boolean>(() => {
   return (
     quizStore.currentQuestion.questionId === quizStore.questions.length - 1
   );
 });
+
 // background-color for wrong and right answers
-const isGreenBg = (index) => {
-  if (quizStore.selectionMode === 1) {
+const isGreenBg = (index: number): boolean | undefined => {
+  if (quizStore.selectionMode === 1 && quizStore.currentQuestion) {
     return (
       index === quizStore.correctAnswers[quizStore.currentQuestion.questionId]
     );
   }
 };
-const isRedBg = (index) => {
-  if (quizStore.selectionMode === 1 && !quizStore.compSelectAndCorrection) {
-    console.log(quizStore.compSelectAndCorrection);
+const isRedBg = (index: number): boolean | undefined => {
+  if (quizStore.selectionMode === 1 && !quizStore.compSelectAndCorrection && quizStore.currentQuestion) {
     return index === quizStore.selections[quizStore.currentQuestion.questionId];
   }
 };
 // increment/decrement question number
-const incDecQuestionNo = (type) => {
+const incDecQuestionNo = (type: string) => {
+  if (questionNumber.value)
   if (type === "inc" && questionNumber.value >= 0) questionNumber.value++;
   else if (type === "dec" && questionNumber.value <= quizStore.questions.length)
     questionNumber.value--;
 };
 // navigate quiz and reset selected option after user navigates quiz
-const handleClick = (navType) => {
+const handleClick = (navType: string) => {
   navType === "next"
     ? quizStore.nextQuestion()
     : navType === "prev" && quizStore.previousQuestion();
   selected.value = null;
 };
 // decoder for HTML entities
-let decoder = ref(null);
-const decode = (html) => {
+let decoder: Ref<null | HTMLDivElement> = ref(null);
+function decode<T extends string>(html: T) {
   decoder.value = decoder.value || document.createElement("div");
   decoder.value.innerHTML = html;
   return decoder.value.textContent;
-};
+}
 
 onUnmounted(() => {
   quizStore.stopTimer();

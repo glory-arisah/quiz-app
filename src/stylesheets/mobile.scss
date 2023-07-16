@@ -72,8 +72,8 @@ body {
         justify-content: center;
         margin-bottom: 1.5rem;
         canvas {
-          width: 13rem;
-          height: 13rem;
+          width: 13rem !important;
+          height: 13rem !important;
         }
       }
       a {

@@ -1,6 +1,9 @@
 <template>
   <subject-name />
-  <section class="score-board--container" v-show="correctAnswersCount >= 0">
+  <section
+    class="score-board--container"
+    v-show="correctAnswersCount && correctAnswersCount >= 0"
+  >
     <div class="result">
       <div class="chart--container">
         <doughnut
@@ -20,13 +23,12 @@
           </div>
           <div>
             <p>{{ correctAnswersCount }}</p>
+
             <p>{{ noOfQuestions - correctAnswersCount }}</p>
             <p>{{ skipped }}</p>
             <p>{{ formatTimeUsed }}</p>
           </div>
         </div>
-        <!-- You score <strong>{{ correctAnswersCount }}</strong> out of
-        <strong>{{ noOfQuestions }}.</strong>-->
         <button
           @click="
             quizStore.resetScore();
@@ -58,6 +60,7 @@
           $router.push({ name: 'Home' });
           quizStore.resetScore();
           quizStore.resetQuestions();
+          quizStore.resetTimer();
         "
         class="clickables"
       >
@@ -68,7 +71,7 @@
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import SubjectName from "@/components/SubjectName.vue";
 import { ref } from "vue";
 import { Doughnut } from "vue-chartjs";
@@ -85,8 +88,12 @@ quizStore.fetchQuestionsFromLS();
 quizStore.fetchSelectionsFromLS();
 quizStore.fetchTimerFromLS();
 // fetch user score and questions -- to get the questions count
-const { correctAnswersCount, noOfQuestions, formatTimeUsed } =
-  storeToRefs(quizStore);
+const { noOfQuestions, formatTimeUsed } = storeToRefs(quizStore);
+const correctAnswersCount = computed((): number => {
+  if (quizStore.correctAnswersCount !== null) {
+    return quizStore.correctAnswersCount;
+  } else return 0;
+});
 // const answered = ref(0)
 const skipped = ref(0);
 // chart computed property
@@ -95,10 +102,14 @@ const pieChart = computed(() => {
   const answered = Object.values(quizStore.selections).filter(
     (val) => val !== null
   ).length;
-  const unanswered = parseInt(questionsCount - answered);
+  const unanswered = questionsCount - answered;
   skipped.value = unanswered;
-  const passed = parseInt(quizStore.correctAnswersCount);
-  const missed = parseInt(questionsCount - passed);
+  let passed = 0;
+  let missed = 0;
+  if (quizStore.correctAnswersCount) {
+    passed = quizStore.correctAnswersCount;
+    missed = questionsCount - passed;
+  }
   return {
     labels: ["answered", "not answered", "passed", "missed"],
     datasets: [
@@ -109,9 +120,10 @@ const pieChart = computed(() => {
     ],
   };
 });
-const scorePercentage = computed(() => {
+const scorePercentage = computed((): string | undefined => {
   const questionsCount = quizStore.questions.length;
-  return `${(quizStore.correctAnswersCount / questionsCount) * 100}%`;
+  if (quizStore.correctAnswersCount)
+    return `${(quizStore.correctAnswersCount / questionsCount) * 100}%`;
 });
 </script>
 

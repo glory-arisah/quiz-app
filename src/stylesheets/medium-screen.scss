@@ -90,6 +90,7 @@
     .result {
       display: flex !important;
       align-items: center;
+      justify-content: center;
       a {
         &:hover {
           text-decoration: none;
@@ -97,8 +98,8 @@
       }
       .chart--container {
         canvas {
-          width: 16.5rem;
-          height: 16.5rem;
+          width: 20rem !important;
+          height: 20rem !important;
         }
       }
     }
